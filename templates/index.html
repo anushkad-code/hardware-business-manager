@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Hardware Business Manager</title>
     <style>
         body { font-family: Arial; margin: 0; background: #f4f4f4; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; display: flex; justify-content: space-between; align-items: center; }
         .cards { display: flex; gap: 20px; padding: 30px; flex-wrap: wrap; }
         .card { background: white; padding: 30px; border-radius: 8px; width: 180px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: #2c3e50; }
         .card h1 { font-size: 48px; margin: 0; color: #2c3e50; }
@@ -19,7 +20,26 @@
     </style>
 </head>
 <body>
-    <div class="navbar">🔧 Hardware Business Manager</div>
+    <div class="navbar">
+        <span>🔧 Hardware Business Manager</span>
+        <div>
+            <span style="font-size:14px; margin-right:15px;">
+                👤 {{ current_user.username }} 
+                ({{ current_user.role }})
+            </span>
+            {% if current_user.role == 'admin' %}
+            <a href="/register" style="color:white; margin-right:15px; font-size:14px;">
+                Add User
+            </a>
+            {% endif %}
+            <a href="/logout" style="background:#e74c3c; color:white; 
+                padding:8px 15px; border-radius:4px; 
+                text-decoration:none; font-size:14px;">
+                Logout
+            </a>
+        </div>
+    </div>
+
     <div class="cards">
         <a href="/inventory" class="card">
             <h1>{{ item_count }}</h1>
@@ -53,3 +73,4 @@
 
 </body>
 </html>
+

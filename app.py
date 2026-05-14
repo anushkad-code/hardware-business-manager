@@ -1,12 +1,26 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///business.db'
+app.config['SECRET_KEY'] = 'hardwarebusiness2024'
 
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
-# OOP - Each class represents a table in the database
+# OOP - Database Models
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(20), default='staff')
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
 class InventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -36,96 +50,77 @@ class Job(db.Model):
     def __repr__(self):
         return f'<Job {self.title}>'
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Auth Routes
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('home'))
+        flash('Invalid username or password')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# Dashboard
 @app.route('/')
+@login_required
 def home():
     item_count = InventoryItem.query.count()
     customer_count = Customer.query.count()
     job_count = Job.query.count()
     pending_count = Job.query.filter_by(status='Pending').count()
     low_stock = InventoryItem.query.filter(InventoryItem.quantity < 10).all()
-    return render_template('index.html', item_count=item_count, 
-                         customer_count=customer_count, 
-                         job_count=job_count, 
+    return render_template('index.html', item_count=item_count,
+                         customer_count=customer_count,
+                         job_count=job_count,
                          pending_count=pending_count,
                          low_stock=low_stock)
 
-
-# Create all tables
-with app.app_context():
-    db.create_all()
-
-from flask import Flask, render_template, request, redirect, url_for
-
+# Inventory Routes
 @app.route('/inventory')
+@login_required
 def inventory():
     search = request.args.get('search', '')
     category = request.args.get('category', '')
-    
     query = InventoryItem.query
-    
     if search:
         query = query.filter(InventoryItem.name.ilike(f'%{search}%'))
     if category:
         query = query.filter_by(category=category)
-    
     items = query.all()
     categories = db.session.query(InventoryItem.category).distinct().all()
     categories = [c[0] for c in categories if c[0]]
-    
-    return render_template('inventory.html', items=items, 
+    return render_template('inventory.html', items=items,
                          search=search, category=category,
                          categories=categories)
 
-
 @app.route('/inventory/add', methods=['POST'])
+@login_required
 def add_item():
-    name = request.form['name']
-    quantity = int(request.form['quantity'])
-    price = float(request.form['price'])
-    category = request.form['category']
-    
-    new_item = InventoryItem(name=name, quantity=quantity, price=price, category=category)
+    new_item = InventoryItem(
+        name=request.form['name'],
+        quantity=int(request.form['quantity']),
+        price=float(request.form['price']),
+        category=request.form['category']
+    )
     db.session.add(new_item)
     db.session.commit()
-    
     return redirect(url_for('inventory'))
 
-@app.route('/customers')
-def customers():
-    all_customers = Customer.query.all()
-    return render_template('customers.html', customers=all_customers)
-
-@app.route('/customers/add', methods=['POST'])
-def add_customer():
-    name = request.form['name']
-    phone = request.form['phone']
-    email = request.form['email']
-    
-    new_customer = Customer(name=name, phone=phone, email=email)
-    db.session.add(new_customer)
-    db.session.commit()
-    
-    return redirect(url_for('customers'))
-
-@app.route('/jobs')
-def jobs():
-    all_jobs = Job.query.all()
-    all_customers = Customer.query.all()
-    return render_template('jobs.html', jobs=all_jobs, customers=all_customers)
-
-@app.route('/jobs/add', methods=['POST'])
-def add_job():
-    title = request.form['title']
-    status = request.form['status']
-    customer_id = request.form['customer_id'] or None
-    
-    new_job = Job(title=title, status=status, customer_id=customer_id)
-    db.session.add(new_job)
-    db.session.commit()
-    
-    return redirect(url_for('jobs'))
-
 @app.route('/inventory/delete/<int:id>')
+@login_required
 def delete_item(id):
     item = InventoryItem.query.get_or_404(id)
     db.session.delete(item)
@@ -133,6 +128,7 @@ def delete_item(id):
     return redirect(url_for('inventory'))
 
 @app.route('/inventory/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_item(id):
     item = InventoryItem.query.get_or_404(id)
     if request.method == 'POST':
@@ -144,7 +140,27 @@ def edit_item(id):
         return redirect(url_for('inventory'))
     return render_template('edit_item.html', item=item)
 
+# Customer Routes
+@app.route('/customers')
+@login_required
+def customers():
+    all_customers = Customer.query.all()
+    return render_template('customers.html', customers=all_customers)
+
+@app.route('/customers/add', methods=['POST'])
+@login_required
+def add_customer():
+    new_customer = Customer(
+        name=request.form['name'],
+        phone=request.form['phone'],
+        email=request.form['email']
+    )
+    db.session.add(new_customer)
+    db.session.commit()
+    return redirect(url_for('customers'))
+
 @app.route('/customers/delete/<int:id>')
+@login_required
 def delete_customer(id):
     customer = Customer.query.get_or_404(id)
     db.session.delete(customer)
@@ -152,6 +168,7 @@ def delete_customer(id):
     return redirect(url_for('customers'))
 
 @app.route('/customers/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_customer(id):
     customer = Customer.query.get_or_404(id)
     if request.method == 'POST':
@@ -162,6 +179,54 @@ def edit_customer(id):
         return redirect(url_for('customers'))
     return render_template('edit_customer.html', customer=customer)
 
+# Job Routes
+@app.route('/jobs')
+@login_required
+def jobs():
+    all_jobs = Job.query.all()
+    all_customers = Customer.query.all()
+    return render_template('jobs.html', jobs=all_jobs, customers=all_customers)
+
+@app.route('/jobs/add', methods=['POST'])
+@login_required
+def add_job():
+    new_job = Job(
+        title=request.form['title'],
+        status=request.form['status'],
+        customer_id=request.form['customer_id'] or None
+    )
+    db.session.add(new_job)
+    db.session.commit()
+    return redirect(url_for('jobs'))
+
+# Admin only - create staff accounts
+@app.route('/register', methods=['GET', 'POST'])
+@login_required
+def register():
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'])
+        role = request.form['role']
+        new_user = User(username=username, password=password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('User created successfully!')
+        return redirect(url_for('home'))
+    return render_template('register.html')
+
+# Create tables and default admin
+with app.app_context():
+    db.create_all()
+    if not User.query.filter_by(username='admin').first():
+        admin = User(
+            username='admin',
+            password=generate_password_hash('admin123'),
+            role='admin'
+        )
+        db.session.add(admin)
+        db.session.commit()
+
 if __name__ == '__main__':
     app.run(debug=True)
-
