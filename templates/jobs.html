@@ -1,11 +1,14 @@
-
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs</title>
     <style>
+        * { box-sizing: border-box; }
         body { font-family: Arial; margin: 0; background: #f4f4f4; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 20px; 
+            font-size: 18px; display: flex; justify-content: space-between; 
+            align-items: center; flex-wrap: wrap; gap: 10px; }
         .container { padding: 30px; }
         form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
         input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
@@ -13,12 +16,28 @@
         table { width: 100%; border-collapse: collapse; background: white; }
         th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         th { background: #2c3e50; color: white; }
-        .pending { color: orange; }
-        .completed { color: green; }
+        .pending { color: orange; font-weight: bold; }
+        .in-progress { color: #2980b9; font-weight: bold; }
+        .completed { color: green; font-weight: bold; }
+        .logout-btn { background: #e74c3c; color: white; 
+            padding: 8px 15px; border-radius: 4px; 
+            text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="navbar">📋 Job Management</div>
+    <div class="navbar">
+        <span>📋 Job Management</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:14px;">
+                👤 {{ current_user.username }} 
+                ({{ current_user.role }})
+            </span>
+            <a href="/" style="color:white; font-size:14px; 
+                text-decoration:none;">Dashboard</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
     <div class="container">
         <h2>Add Job</h2>
         <form method="POST" action="/jobs/add">
@@ -40,16 +59,30 @@
         <h2>All Jobs</h2>
         <table>
             <tr>
-                <th>Job</th><th>Customer</th><th>Status</th>
+                <th>Job</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Invoice</th>
             </tr>
             {% for job in jobs %}
             <tr>
                 <td>{{ job.title }}</td>
                 <td>{{ job.customer.name if job.customer else 'N/A' }}</td>
-                <td class="{{ job.status | lower }}">{{ job.status }}</td>
+                <td class="{{ job.status | lower | replace(' ', '-') }}">
+                    {{ job.status }}
+                </td>
+                <td>
+                    <a href="/invoice/{{ job.id }}" 
+                       style="background:#27ae60; color:white; 
+                       padding:5px 10px; border-radius:4px; 
+                       text-decoration:none;">
+                       📄 Invoice
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </table>
     </div>
 </body>
 </html>
+
