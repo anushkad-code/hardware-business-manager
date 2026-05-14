@@ -107,7 +107,42 @@ def add_job():
     
     return redirect(url_for('jobs'))
 
+@app.route('/inventory/delete/<int:id>')
+def delete_item(id):
+    item = InventoryItem.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('inventory'))
 
+@app.route('/inventory/edit/<int:id>', methods=['GET', 'POST'])
+def edit_item(id):
+    item = InventoryItem.query.get_or_404(id)
+    if request.method == 'POST':
+        item.name = request.form['name']
+        item.quantity = int(request.form['quantity'])
+        item.price = float(request.form['price'])
+        item.category = request.form['category']
+        db.session.commit()
+        return redirect(url_for('inventory'))
+    return render_template('edit_item.html', item=item)
+
+@app.route('/customers/delete/<int:id>')
+def delete_customer(id):
+    customer = Customer.query.get_or_404(id)
+    db.session.delete(customer)
+    db.session.commit()
+    return redirect(url_for('customers'))
+
+@app.route('/customers/edit/<int:id>', methods=['GET', 'POST'])
+def edit_customer(id):
+    customer = Customer.query.get_or_404(id)
+    if request.method == 'POST':
+        customer.name = request.form['name']
+        customer.phone = request.form['phone']
+        customer.email = request.form['email']
+        db.session.commit()
+        return redirect(url_for('customers'))
+    return render_template('edit_customer.html', customer=customer)
 
 if __name__ == '__main__':
     app.run(debug=True)

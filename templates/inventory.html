@@ -29,17 +29,30 @@
         <h2>Current Stock</h2>
         <table>
             <tr>
-                <th>Item</th><th>Quantity</th><th>Price</th><th>Category</th>
+                <th>Item</th><th>Quantity</th><th>Price</th><th>Category</th><th>Actions</th>
             </tr>
-            {% for item in items %}
-            <tr>
-                <td>{{ item.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>${{ item.price }}</td>
-                <td>{{ item.category }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+                  {% for item in items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.price }}</td>
+            <td>{{ item.category }}</td>
+            <td>
+                <a href="/inventory/edit/{{ item.id }}" 
+                   style="background:#2c3e50; color:white; 
+                   padding:5px 10px; border-radius:4px; 
+                   text-decoration:none;">Edit</a>
+                <a href="/inventory/delete/{{ item.id }}" 
+                   style="background:#e74c3c; color:white; 
+                   padding:5px 10px; border-radius:4px; 
+                   text-decoration:none;"
+                   onclick="return confirm('Delete this item?')">
+                   Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
     </div>
 </body>
 </html>
+

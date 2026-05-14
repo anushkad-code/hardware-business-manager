@@ -28,15 +28,28 @@
         <h2>Customer List</h2>
         <table>
             <tr>
-                <th>Name</th><th>Phone</th><th>Email</th>
+                <th>Name</th><th>Phone</th><th>Email</th><th>Actions</th>
             </tr>
             {% for customer in customers %}
-            <tr>
-                <td>{{ customer.name }}</td>
-                <td>{{ customer.phone }}</td>
-                <td>{{ customer.email }}</td>
-            </tr>
-            {% endfor %}
+<tr>
+    <td>{{ customer.name }}</td>
+    <td>{{ customer.phone }}</td>
+    <td>{{ customer.email }}</td>
+    <td>
+        <a href="/customers/edit/{{ customer.id }}" 
+           style="background:#2c3e50; color:white; 
+           padding:5px 10px; border-radius:4px; 
+           text-decoration:none;">Edit</a>
+        <a href="/customers/delete/{{ customer.id }}" 
+           style="background:#e74c3c; color:white; 
+           padding:5px 10px; border-radius:4px; 
+           text-decoration:none;"
+           onclick="return confirm('Delete this customer?')">
+           Delete</a>
+    </td>
+</tr>
+{% endfor %}
+
         </table>
     </div>
 </body>
