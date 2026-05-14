@@ -11,6 +11,11 @@
         .card p { margin: 10px 0 0; font-size: 16px; }
         .card:hover { background: #2c3e50; color: white; }
         .card:hover h1 { color: white; }
+        .alert { margin: 0 30px; background: #fff3cd; 
+            border-left: 5px solid #e74c3c; padding: 15px; 
+            border-radius: 4px; }
+        .alert h3 { color: #e74c3c; margin: 0 0 10px; }
+        .alert p { margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -33,5 +38,18 @@
             <p>⏳ Pending Jobs</p>
         </a>
     </div>
+
+    {% if low_stock %}
+    <div class="alert">
+        <h3>⚠️ Low Stock Alerts</h3>
+        {% for item in low_stock %}
+        <p>
+            <strong>{{ item.name }}</strong> — 
+            only {{ item.quantity }} units remaining
+        </p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
 </body>
 </html>

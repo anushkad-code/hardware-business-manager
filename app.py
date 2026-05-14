@@ -42,10 +42,12 @@ def home():
     customer_count = Customer.query.count()
     job_count = Job.query.count()
     pending_count = Job.query.filter_by(status='Pending').count()
+    low_stock = InventoryItem.query.filter(InventoryItem.quantity < 10).all()
     return render_template('index.html', item_count=item_count, 
                          customer_count=customer_count, 
                          job_count=job_count, 
-                         pending_count=pending_count)
+                         pending_count=pending_count,
+                         low_stock=low_stock)
 
 
 # Create all tables
