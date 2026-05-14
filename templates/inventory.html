@@ -7,11 +7,14 @@
         .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
         .container { padding: 30px; }
         form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
         button { background: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
         table { width: 100%; border-collapse: collapse; background: white; }
         th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         th { background: #2c3e50; color: white; }
+        .search-bar { background: white; padding: 15px 20px; 
+            border-radius: 8px; margin-bottom: 20px; 
+            display: flex; gap: 10px; align-items: center; }
     </style>
 </head>
 <body>
@@ -27,6 +30,27 @@
         </form>
 
         <h2>Current Stock</h2>
+
+        <form method="GET" action="/inventory" class="search-bar">
+            <input type="text" name="search" 
+                placeholder="🔍 Search items..." 
+                value="{{ search }}">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" 
+                    {% if cat == category %}selected{% endif %}>
+                    {{ cat }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Search</button>
+            <a href="/inventory" 
+               style="background:#95a5a6; color:white; 
+               padding:10px 20px; border-radius:4px; 
+               text-decoration:none;">Clear</a>
+        </form>
+
         <table>
             <tr>
                 <th>Item</th>

@@ -58,8 +58,24 @@ from flask import Flask, render_template, request, redirect, url_for
 
 @app.route('/inventory')
 def inventory():
-    items = InventoryItem.query.all()
-    return render_template('inventory.html', items=items)
+    search = request.args.get('search', '')
+    category = request.args.get('category', '')
+    
+    query = InventoryItem.query
+    
+    if search:
+        query = query.filter(InventoryItem.name.ilike(f'%{search}%'))
+    if category:
+        query = query.filter_by(category=category)
+    
+    items = query.all()
+    categories = db.session.query(InventoryItem.category).distinct().all()
+    categories = [c[0] for c in categories if c[0]]
+    
+    return render_template('inventory.html', items=items, 
+                         search=search, category=category,
+                         categories=categories)
+
 
 @app.route('/inventory/add', methods=['POST'])
 def add_item():
