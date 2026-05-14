@@ -5,18 +5,33 @@
     <style>
         body { font-family: Arial; margin: 0; background: #f4f4f4; }
         .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
-        .cards { display: flex; gap: 20px; padding: 30px; }
-        .card { background: white; padding: 20px; border-radius: 8px; width: 200px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card h2 { color: #2c3e50; }
+        .cards { display: flex; gap: 20px; padding: 30px; flex-wrap: wrap; }
+        .card { background: white; padding: 30px; border-radius: 8px; width: 180px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: #2c3e50; }
+        .card h1 { font-size: 48px; margin: 0; color: #2c3e50; }
+        .card p { margin: 10px 0 0; font-size: 16px; }
+        .card:hover { background: #2c3e50; color: white; }
+        .card:hover h1 { color: white; }
     </style>
 </head>
 <body>
     <div class="navbar">🔧 Hardware Business Manager</div>
     <div class="cards">
-        <div class="card"><h2>📦</h2><p>Inventory</p></div>
-        <div class="card"><h2>👥</h2><p>Customers</p></div>
-        <div class="card"><h2>📋</h2><p>Jobs</p></div>
-        <div class="card"><h2>🧾</h2><p>Invoices</p></div>
+        <a href="/inventory" class="card">
+            <h1>{{ item_count }}</h1>
+            <p>📦 Inventory Items</p>
+        </a>
+        <a href="/customers" class="card">
+            <h1>{{ customer_count }}</h1>
+            <p>👥 Customers</p>
+        </a>
+        <a href="/jobs" class="card">
+            <h1>{{ job_count }}</h1>
+            <p>📋 Jobs</p>
+        </a>
+        <a href="/jobs" class="card">
+            <h1>{{ pending_count }}</h1>
+            <p>⏳ Pending Jobs</p>
+        </a>
     </div>
 </body>
 </html>

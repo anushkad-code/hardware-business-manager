@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jobs</title>
+    <style>
+        body { font-family: Arial; margin: 0; background: #f4f4f4; }
+        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
+        .container { padding: 30px; }
+        form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #2c3e50; color: white; }
+        .pending { color: orange; }
+        .completed { color: green; }
+    </style>
+</head>
+<body>
+    <div class="navbar">📋 Job Management</div>
+    <div class="container">
+        <h2>Add Job</h2>
+        <form method="POST" action="/jobs/add">
+            <input type="text" name="title" placeholder="Job title" required>
+            <select name="customer_id">
+                <option value="">Select customer</option>
+                {% for customer in customers %}
+                <option value="{{ customer.id }}">{{ customer.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="status">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+            <button type="submit">Add Job</button>
+        </form>
+
+        <h2>All Jobs</h2>
+        <table>
+            <tr>
+                <th>Job</th><th>Customer</th><th>Status</th>
+            </tr>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.title }}</td>
+                <td>{{ job.customer.name if job.customer else 'N/A' }}</td>
+                <td class="{{ job.status | lower }}">{{ job.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

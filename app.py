@@ -31,13 +31,22 @@ class Job(db.Model):
     title = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='Pending')
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
+    customer = db.relationship('Customer', backref='jobs')
 
     def __repr__(self):
         return f'<Job {self.title}>'
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    item_count = InventoryItem.query.count()
+    customer_count = Customer.query.count()
+    job_count = Job.query.count()
+    pending_count = Job.query.filter_by(status='Pending').count()
+    return render_template('index.html', item_count=item_count, 
+                         customer_count=customer_count, 
+                         job_count=job_count, 
+                         pending_count=pending_count)
+
 
 # Create all tables
 with app.app_context():
@@ -63,5 +72,43 @@ def add_item():
     
     return redirect(url_for('inventory'))
 
+@app.route('/customers')
+def customers():
+    all_customers = Customer.query.all()
+    return render_template('customers.html', customers=all_customers)
+
+@app.route('/customers/add', methods=['POST'])
+def add_customer():
+    name = request.form['name']
+    phone = request.form['phone']
+    email = request.form['email']
+    
+    new_customer = Customer(name=name, phone=phone, email=email)
+    db.session.add(new_customer)
+    db.session.commit()
+    
+    return redirect(url_for('customers'))
+
+@app.route('/jobs')
+def jobs():
+    all_jobs = Job.query.all()
+    all_customers = Customer.query.all()
+    return render_template('jobs.html', jobs=all_jobs, customers=all_customers)
+
+@app.route('/jobs/add', methods=['POST'])
+def add_job():
+    title = request.form['title']
+    status = request.form['status']
+    customer_id = request.form['customer_id'] or None
+    
+    new_job = Job(title=title, status=status, customer_id=customer_id)
+    db.session.add(new_job)
+    db.session.commit()
+    
+    return redirect(url_for('jobs'))
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
