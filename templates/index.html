@@ -1,76 +1,156 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hardware Business Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Manager</title>
     <style>
-        body { font-family: Arial; margin: 0; background: #f4f4f4; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .cards { display: flex; gap: 20px; padding: 30px; flex-wrap: wrap; }
-        .card { background: white; padding: 30px; border-radius: 8px; width: 180px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: #2c3e50; }
-        .card h1 { font-size: 48px; margin: 0; color: #2c3e50; }
-        .card p { margin: 10px 0 0; font-size: 16px; }
-        .card:hover { background: #2c3e50; color: white; }
-        .card:hover h1 { color: white; }
-        .alert { margin: 0 30px; background: #fff3cd; 
-            border-left: 5px solid #e74c3c; padding: 15px; 
-            border-radius: 4px; }
-        .alert h3 { color: #e74c3c; margin: 0 0 10px; }
-        .alert p { margin: 5px 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial; background: #0d1b2a; min-height: 100vh; }
+        .navbar { 
+            background: #1a1a1a; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 3px solid #C9A84C;
+        }
+        .navbar-left { 
+            color: #C9A84C; 
+            font-size: 20px; 
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .navbar-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .user-info { 
+            color: #888; 
+            font-size: 13px; 
+        }
+        .user-info span { color: #C9A84C; }
+        .btn-add-user {
+            color: #C9A84C;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #C9A84C;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .btn-logout { 
+            background: #C9A84C; 
+            color: #0d1b2a; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .btn-logout:hover { background: #b8963e; }
+        .container { padding: 30px; }
+        .page-title {
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .cards { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .card { 
+            background: #1a1a1a; 
+            padding: 30px; 
+            border-radius: 8px; 
+            flex: 1; 
+            min-width: 160px; 
+            text-align: center; 
+            text-decoration: none; 
+            color: white;
+            border-bottom: 3px solid #C9A84C;
+            transition: transform 0.2s;
+        }
+        .card:hover { 
+            transform: translateY(-3px);
+            background: #C9A84C;
+            color: #0d1b2a;
+        }
+        .card h1 { 
+            font-size: 48px; 
+            margin: 0 0 10px; 
+            color: #C9A84C; 
+        }
+        .card:hover h1 { color: #0d1b2a; }
+        .card p { font-size: 14px; letter-spacing: 1px; }
+        .alert { 
+            background: #1a1a1a; 
+            border-left: 4px solid #C9A84C; 
+            padding: 20px; 
+            border-radius: 8px;
+        }
+        .alert h3 { 
+            color: #C9A84C; 
+            margin-bottom: 10px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .alert p { color: #ccc; margin: 5px 0; font-size: 14px; }
+        .alert strong { color: #C9A84C; }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <span>🔧 Hardware Business Manager</span>
-        <div>
-            <span style="font-size:14px; margin-right:15px;">
-                👤 {{ current_user.username }} 
+        <div class="navbar-left">⚙️ BUSINESS MANAGER</div>
+        <div class="navbar-right">
+            <div class="user-info">
+                👤 <span>{{ current_user.username }}</span>
                 ({{ current_user.role }})
-            </span>
+            </div>
             {% if current_user.role == 'admin' %}
-            <a href="/register" style="color:white; margin-right:15px; font-size:14px;">
-                Add User
-            </a>
+            <a href="/register" class="btn-add-user">+ Add User</a>
             {% endif %}
-            <a href="/logout" style="background:#e74c3c; color:white; 
-                padding:8px 15px; border-radius:4px; 
-                text-decoration:none; font-size:14px;">
-                Logout
-            </a>
+            <a href="/logout" class="btn-logout">Logout</a>
         </div>
     </div>
 
-    <div class="cards">
-        <a href="/inventory" class="card">
-            <h1>{{ item_count }}</h1>
-            <p>📦 Inventory Items</p>
-        </a>
-        <a href="/customers" class="card">
-            <h1>{{ customer_count }}</h1>
-            <p>👥 Customers</p>
-        </a>
-        <a href="/jobs" class="card">
-            <h1>{{ job_count }}</h1>
-            <p>📋 Jobs</p>
-        </a>
-        <a href="/jobs" class="card">
-            <h1>{{ pending_count }}</h1>
-            <p>⏳ Pending Jobs</p>
-        </a>
-    </div>
+    <div class="container">
+        <p class="page-title">Dashboard Overview</p>
 
-    {% if low_stock %}
-    <div class="alert">
-        <h3>⚠️ Low Stock Alerts</h3>
-        {% for item in low_stock %}
-        <p>
-            <strong>{{ item.name }}</strong> — 
-            only {{ item.quantity }} units remaining
-        </p>
-        {% endfor %}
-    </div>
-    {% endif %}
+        <div class="cards">
+            <a href="/inventory" class="card">
+                <h1>{{ item_count }}</h1>
+                <p>📦 INVENTORY</p>
+            </a>
+            <a href="/customers" class="card">
+                <h1>{{ customer_count }}</h1>
+                <p>👥 CUSTOMERS</p>
+            </a>
+            <a href="/jobs" class="card">
+                <h1>{{ job_count }}</h1>
+                <p>📋 JOBS</p>
+            </a>
+            <a href="/jobs" class="card">
+                <h1>{{ pending_count }}</h1>
+                <p>⏳ PENDING</p>
+            </a>
+        </div>
 
+        {% if low_stock %}
+        <div class="alert">
+            <h3>⚠️ Low Stock Alerts</h3>
+            {% for item in low_stock %}
+            <p>
+                <strong>{{ item.name }}</strong> — 
+                only {{ item.quantity }} units remaining
+            </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
-

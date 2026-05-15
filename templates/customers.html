@@ -1,57 +1,193 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customers</title>
     <style>
-        body { font-family: Arial; margin: 0; background: #f4f4f4; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial; background: #000000; min-height: 100vh; }
+        .navbar { 
+            background: #1a1a1a; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 3px solid #C9A84C;
+        }
+        .navbar-left { 
+            color: #C9A84C; 
+            font-size: 20px; 
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .navbar-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .user-info { color: #888; font-size: 13px; }
+        .user-info span { color: #C9A84C; }
+        .btn-back {
+            color: #C9A84C;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #C9A84C;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .btn-logout { 
+            background: #C9A84C; 
+            color: #000000; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-size: 13px;
+            font-weight: bold;
+        }
         .container { padding: 30px; }
-        form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #2c3e50; color: white; }
+        .page-title {
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .form-card {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-top: 3px solid #C9A84C;
+        }
+        .form-card h2 {
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        input { 
+            padding: 10px 12px; 
+            margin: 5px; 
+            background: #000000;
+            border: 1px solid #333; 
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #C9A84C;
+        }
+        input::placeholder { color: #555; }
+        .btn-primary { 
+            background: #C9A84C; 
+            color: #0d1b2a; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover { background: #b8963e; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th { 
+            background: #C9A84C; 
+            color: #0d1b2a;
+            padding: 12px 15px; 
+            text-align: left;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        td { 
+            padding: 12px 15px; 
+            border-bottom: 1px solid #222;
+            color: #ccc;
+            font-size: 14px;
+        }
+        tr:hover td { background: #222; }
+        .btn-edit {
+            background: #0d1b2a;
+            color: #C9A84C;
+            padding: 5px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #C9A84C;
+            margin-right: 5px;
+        }
+        .btn-delete {
+            background: #7b1c1c;
+            color: #ff6b6b;
+            padding: 5px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
-    <div class="navbar">👥 Customer Management</div>
-    <div class="container">
-        <h2>Add Customer</h2>
-        <form method="POST" action="/customers/add">
-            <input type="text" name="name" placeholder="Customer name" required>
-            <input type="text" name="phone" placeholder="Phone number">
-            <input type="email" name="email" placeholder="Email address">
-            <button type="submit">Add Customer</button>
-        </form>
+    <div class="navbar">
+        <div class="navbar-left">👥 CUSTOMERS</div>
+        <div class="navbar-right">
+            <div class="user-info">
+                👤 <span>{{ current_user.username }}</span>
+            </div>
+            <a href="/" class="btn-back">← Dashboard</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </div>
 
-        <h2>Customer List</h2>
+    <div class="container">
+        <p class="page-title">Customer Management</p>
+
+        <div class="form-card">
+            <h2>Add New Customer</h2>
+            <form method="POST" action="/customers/add">
+                <input type="text" name="name" 
+                    placeholder="Customer name" required>
+                <input type="text" name="phone" 
+                    placeholder="Phone number">
+                <input type="email" name="email" 
+                    placeholder="Email address">
+                <button type="submit" class="btn-primary">
+                    + ADD CUSTOMER
+                </button>
+            </form>
+        </div>
+
         <table>
             <tr>
-                <th>Name</th><th>Phone</th><th>Email</th><th>Actions</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
             </tr>
             {% for customer in customers %}
-<tr>
-    <td>{{ customer.name }}</td>
-    <td>{{ customer.phone }}</td>
-    <td>{{ customer.email }}</td>
-    <td>
-        <a href="/customers/edit/{{ customer.id }}" 
-           style="background:#2c3e50; color:white; 
-           padding:5px 10px; border-radius:4px; 
-           text-decoration:none;">Edit</a>
-        <a href="/customers/delete/{{ customer.id }}" 
-           style="background:#e74c3c; color:white; 
-           padding:5px 10px; border-radius:4px; 
-           text-decoration:none;"
-           onclick="return confirm('Delete this customer?')">
-           Delete</a>
-    </td>
-</tr>
-{% endfor %}
-
+            <tr>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.phone }}</td>
+                <td>{{ customer.email }}</td>
+                <td>
+                    <a href="/customers/edit/{{ customer.id }}" 
+                       class="btn-edit">Edit</a>
+                    <a href="/customers/delete/{{ customer.id }}" 
+                       class="btn-delete"
+                       onclick="return confirm('Delete this customer?')">
+                       Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
         </table>
     </div>
 </body>
 </html>
-

@@ -1,61 +1,223 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory</title>
     <style>
-        body { font-family: Arial; margin: 0; background: #f4f4f4; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; font-size: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial; background: #0d1b2a; min-height: 100vh; }
+        .navbar { 
+            background: #1a1a1a; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 3px solid #C9A84C;
+        }
+        .navbar-left { 
+            color: #C9A84C; 
+            font-size: 20px; 
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .navbar-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .user-info { color: #888; font-size: 13px; }
+        .user-info span { color: #C9A84C; }
+        .btn-back {
+            color: #C9A84C;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #C9A84C;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .btn-logout { 
+            background: #C9A84C; 
+            color: #0d1b2a; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-size: 13px;
+            font-weight: bold;
+        }
         .container { padding: 30px; }
-        form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #2c3e50; color: white; }
-        .search-bar { background: white; padding: 15px 20px; 
-            border-radius: 8px; margin-bottom: 20px; 
-            display: flex; gap: 10px; align-items: center; }
+        .page-title {
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .form-card {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-top: 3px solid #C9A84C;
+        }
+        .form-card h2 {
+            color: #C9A84C;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        input, select { 
+            padding: 10px 12px; 
+            margin: 5px; 
+            background: #0d1b2a;
+            border: 1px solid #333; 
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #C9A84C;
+        }
+        input::placeholder { color: #555; }
+        .btn-primary { 
+            background: #C9A84C; 
+            color: #0d1b2a; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover { background: #b8963e; }
+        .btn-clear {
+            background: #333;
+            color: #ccc;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .search-bar { 
+            background: #1a1a1a; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th { 
+            background: #C9A84C; 
+            color: #0d1b2a;
+            padding: 12px 15px; 
+            text-align: left;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        td { 
+            padding: 12px 15px; 
+            border-bottom: 1px solid #222;
+            color: #ccc;
+            font-size: 14px;
+        }
+        tr:hover td { background: #222; }
+        .low-stock { 
+            background: #7b1c1c; 
+            color: #ff6b6b; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            margin-left: 8px; 
+        }
+        .btn-edit {
+            background: #0d1b2a;
+            color: #C9A84C;
+            padding: 5px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #C9A84C;
+            margin-right: 5px;
+        }
+        .btn-delete {
+            background: #7b1c1c;
+            color: #ff6b6b;
+            padding: 5px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
-    <div class="navbar">📦 Inventory Management</div>
+    <div class="navbar">
+        <div class="navbar-left">📦 INVENTORY</div>
+        <div class="navbar-right">
+            <div class="user-info">
+                👤 <span>{{ current_user.username }}</span>
+            </div>
+            <a href="/" class="btn-back">← Dashboard</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </div>
+
     <div class="container">
-        <h2>Add Item</h2>
-        <form method="POST" action="/inventory/add">
-            <input type="text" name="name" placeholder="Item name" required>
-            <input type="number" name="quantity" placeholder="Quantity" required>
-            <input type="number" name="price" placeholder="Price" step="0.01" required>
-            <input type="text" name="category" placeholder="Category">
-            <button type="submit">Add Item</button>
-        </form>
+        <p class="page-title">Inventory Management</p>
 
-        <h2>Current Stock</h2>
+        <div class="form-card">
+            <h2>Add New Item</h2>
+            <form method="POST" action="/inventory/add">
+                <input type="text" name="name" 
+                    placeholder="Item name" required>
+                <input type="number" name="quantity" 
+                    placeholder="Quantity" required>
+                <input type="number" name="price" 
+                    placeholder="Price (TTD)" step="0.01" required>
+                <input type="text" name="category" 
+                    placeholder="Category">
+                <button type="submit" class="btn-primary">
+                    + ADD ITEM
+                </button>
+            </form>
+        </div>
 
-        <form method="GET" action="/inventory" class="search-bar">
-            <input type="text" name="search" 
-                placeholder="🔍 Search items..." 
-                value="{{ search }}">
-            <select name="category">
-                <option value="">All Categories</option>
-                {% for cat in categories %}
-                <option value="{{ cat }}" 
-                    {% if cat == category %}selected{% endif %}>
-                    {{ cat }}
-                </option>
-                {% endfor %}
-            </select>
-            <button type="submit">Search</button>
-            <a href="/inventory" 
-               style="background:#95a5a6; color:white; 
-               padding:10px 20px; border-radius:4px; 
-               text-decoration:none;">Clear</a>
-        </form>
+        <div class="search-bar">
+            <form method="GET" action="/inventory" 
+                style="display:flex; gap:10px; flex-wrap:wrap; width:100%;">
+                <input type="text" name="search" 
+                    placeholder="🔍 Search items..." 
+                    value="{{ search }}">
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" 
+                        {% if cat == category %}selected{% endif %}>
+                        {{ cat }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-primary">Search</button>
+                <a href="/inventory" class="btn-clear">Clear</a>
+            </form>
+        </div>
 
         <table>
             <tr>
                 <th>Item</th>
                 <th>Quantity</th>
-                <th>Price</th>
+                <th>Price (TTD)</th>
                 <th>Category</th>
                 <th>Actions</th>
             </tr>
@@ -65,24 +227,16 @@
                 <td>
                     {{ item.quantity }}
                     {% if item.quantity < 10 %}
-                    <span style="background:#e74c3c; color:white; 
-                        padding:2px 8px; border-radius:4px; 
-                        font-size:12px; margin-left:5px;">
-                        ⚠️ Low Stock
-                    </span>
+                    <span class="low-stock">⚠️ Low Stock</span>
                     {% endif %}
                 </td>
                 <td>${{ item.price }}</td>
                 <td>{{ item.category }}</td>
                 <td>
                     <a href="/inventory/edit/{{ item.id }}" 
-                       style="background:#2c3e50; color:white; 
-                       padding:5px 10px; border-radius:4px; 
-                       text-decoration:none;">Edit</a>
+                       class="btn-edit">Edit</a>
                     <a href="/inventory/delete/{{ item.id }}" 
-                       style="background:#e74c3c; color:white; 
-                       padding:5px 10px; border-radius:4px; 
-                       text-decoration:none;"
+                       class="btn-delete"
                        onclick="return confirm('Delete this item?')">
                        Delete</a>
                 </td>
